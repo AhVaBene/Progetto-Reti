@@ -13,6 +13,9 @@ try:
     
     data, server = sock.recvfrom(4096)
     print(data.decode('utf8'))
+    
+    command = input()  
+    sent = sock.sendto(command.encode(), server_address)
 except Exception as info:
     print (info)
 finally:
