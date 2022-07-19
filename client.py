@@ -42,11 +42,18 @@ try:
                 if data == b'END':
                     file.close()
                     print("File received")
+                    data, server = sock.recvfrom(4096)
+                    expected_size = data.decode('utf8')
+                    actual_size = str(os.path.getsize(download_path + filename)/1024)
+                    if expected_size == actual_size:
+                        print("Download succesful\n")
+                    else:
+                        print("Download not succesful\n")
                     break
                 else:
                     file.write(data)
         else:
-            print("An error has occured")
+            print("The file does not exist")
         
     elif cmd == "put":
         filename = command.split()[1]

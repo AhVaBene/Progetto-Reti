@@ -38,7 +38,7 @@ while True:
             filename = data.decode("utf8")
             print("Client ", address," chose command 2-get %s\n" % filename)
             if not os.path.exists(storage_path + filename):
-                print("File not found")
+                print("File not found\n")
                 ans = "False"
                 sock.sendto(ans.encode(), address)
             else:
@@ -50,9 +50,11 @@ while True:
                     file = fin.read(2048)
                     if file == b'':
                         fin.close()
-                        print("File sent")
+                        print("File sent\n")
                         ans = b'END'
                         sock.sendto(ans, address)
+                        size = str(os.path.getsize(storage_path + filename)/1024)
+                        sock.sendto(size.encode(), address)
                         break
                     else:
                         sock.sendto(file, address)
