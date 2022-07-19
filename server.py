@@ -23,7 +23,7 @@ while True:
     
     if data:
         time.sleep(1)
-        sent = sock.sendto(welcome_message.encode(), address)
+        sock.sendto(welcome_message.encode(), address)
         print("Successfully connected to client ", address)
         
         data, address = sock.recvfrom(4096)
@@ -31,11 +31,31 @@ while True:
         if cmd == "1" or cmd == "list":
             print("Client ", address," chose command 1-list\n")
             ans = getFiles()
-            sent = sock.sendto(ans.encode(), address)
+            sock.sendto(ans.encode(), address)
             
         elif cmd == "get":
-            print("Client ", address," chose command 2-get\n")
-            print("to do")
+            data, address = sock.recvfrom(4096)
+            filename = data.decode("utf8")
+            print("Client ", address," chose command 2-get %s\n" % filename)
+            if not os.path.exists(storage_path + filename):
+                print("File not found")
+                ans = "False"
+                sock.sendto(ans.encode(), address)
+            else:
+                print("File found...sending")
+                ans = "True"
+                sock.sendto(ans.encode(), address)
+                fin = open(storage_path + filename, 'rb')
+                while True:
+                    file = fin.read(2048)
+                    if file == b'':
+                        fin.close()
+                        print("File sent")
+                        ans = b'END'
+                        sock.sendto(ans, address)
+                        break
+                    else:
+                        sock.sendto(file, address)
             
         elif cmd == "put":
             print("Client ", address," chose command 3-put\n")
