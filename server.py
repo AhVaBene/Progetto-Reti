@@ -3,7 +3,7 @@ import time
 import os
 
 sock = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
-storage_path = os.path.dirname(__file__) + os.path.sep + "storage" + os.path.sep
+storage_path = os.path.dirname(__file__) + os.path.sep + "server_storage" + os.path.sep
 
 def getFiles():
     files = ""
@@ -29,7 +29,7 @@ while True:
         data, address = sock.recvfrom(4096)
         cmd = data.decode("utf8")
         if cmd == "1" or cmd == "list":
-            print("Client ", address," chose command 1-list\n")
+            print("Client ", address," has chosen command 1-list\n")
             ans = getFiles()
             sock.sendto(ans.encode(), address)
             
@@ -60,11 +60,31 @@ while True:
                         sock.sendto(file, address)
             
         elif cmd == "put":
-            print("Client ", address," chose command 3-put\n")
-            print("to do")
-            
+            data, address = sock.recvfrom(4096)
+            filename = data.decode("utf8")
+            print("Client ", address," has chosen command 3-put %s\n" % filename)
+            data, server = sock.recvfrom(4096)
+            if data.decode("utf8") == "True":
+                file = open(storage_path + filename, 'wb')
+                while True:
+                    data, server = sock.recvfrom(2048)
+                    if data == b'END':
+                        file.close()
+                        print("File received")
+                        data, server = sock.recvfrom(4096)
+                        expected_size = data.decode('utf8')
+                        actual_size = str(os.path.getsize(storage_path + filename)/1024)
+                        if expected_size == actual_size:
+                            print("Download succesful\n")
+                        else:
+                            print("Download not succesful\n")
+                        break
+                    else:
+                        file.write(data)
+            else:
+                print("The client ahve chosen an invalid file\n")
         else:
-            print("Client ", address," chose an invalid command\n")
+            print("Client ", address," has chosen an invalid command\n")
             
         
             

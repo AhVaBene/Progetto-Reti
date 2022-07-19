@@ -3,7 +3,7 @@ import time
 import os
 
 sock = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
-download_path = os.path.dirname(__file__) + os.path.sep + "download" + os.path.sep
+download_path = os.path.dirname(__file__) + os.path.sep + "client_storage" + os.path.sep
 if not os.path.exists(download_path):
     os.mkdir(download_path)
 
@@ -57,10 +57,31 @@ try:
         
     elif cmd == "put":
         filename = command.split()[1]
-        print("to do")
+        sock.sendto(filename.encode(), server_address)
+        if not os.path.exists(download_path + filename):
+            print("File not found\n")
+            ans = "False"
+            sock.sendto(ans.encode(), server_address)
+        else:
+            ans = "True"
+            sock.sendto(ans.encode(), server_address)
+            print("Starting upload")
+            fin = open(download_path + filename, 'rb')
+            while True:
+                file = fin.read(2048)
+                if file == b'':
+                    fin.close()
+                    print("File sent\n")
+                    ans = b'END'
+                    sock.sendto(ans, server_address)
+                    size = str(os.path.getsize(download_path + filename)/1024)
+                    sock.sendto(size.encode(), server_address)
+                    break
+                else:
+                    sock.sendto(file, server_address)
         
     else:
-        print("You chose an invalid command")
+        print("You have chosen an invalid command")
 
 except Exception as info:
     print (info)
