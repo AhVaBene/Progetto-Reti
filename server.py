@@ -75,16 +75,16 @@ while True:
                         expected_size = data.decode('utf8')
                         actual_size = str(os.path.getsize(storage_path + filename)/1024)
                         if expected_size == actual_size:
+                            flag = "1"
                             print("Download succesful\n")
                         else:
+                            flag = "0"
                             print("Download not succesful\n")
                         break
                     else:
                         file.write(data)
+                sock.sendto(flag.encode(), address)
             else:
                 print("The client ahve chosen an invalid file\n")
         else:
             print("Client ", address," has chosen an invalid command\n")
-            
-        
-            

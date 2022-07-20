@@ -71,7 +71,7 @@ try:
                 file = fin.read(2048)
                 if file == b'':
                     fin.close()
-                    print("File sent\n")
+                    print("File sent")
                     ans = b'END'
                     sock.sendto(ans, server_address)
                     size = str(os.path.getsize(download_path + filename)/1024)
@@ -79,7 +79,13 @@ try:
                     break
                 else:
                     sock.sendto(file, server_address)
-        
+            data, server = sock.recvfrom(4096)
+            result = data.decode('utf8')
+            if result == "1":
+                print("File received without packet loss\n")
+            else:
+                print("File received with packet loss\n")
+
     else:
         print("You have chosen an invalid command")
 
