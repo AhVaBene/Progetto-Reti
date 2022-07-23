@@ -1,5 +1,4 @@
 import socket as sk
-import time
 import os
 
 sock = sk.socket(sk.AF_INET, sk.SOCK_DGRAM)
@@ -8,15 +7,10 @@ if not os.path.exists(download_path):
     os.mkdir(download_path)
 
 server_address = ('localhost', 10000)
-data = "Connection"
+welcome_message = 'Welcome, please select a command\r\n\r\n1. list -> get all the files available in the server\r\n2. get _filename_ -> download _filename_ from the server\r\n3. put _filename_ -> upload a file to the server\r\n'
 
 try:
-    print("Trying to connect to server ",server_address)
-    time.sleep((1))
-    sock.sendto(data.encode(), server_address)
-    
-    data, server = sock.recvfrom(4096)
-    print(data.decode('utf8'))
+    print(welcome_message)
     
     command = input()
     cmd = command.split()[0]
@@ -87,7 +81,7 @@ try:
                 print("File received with packet loss\n")
 
     else:
-        print("You have chosen an invalid command")
+        print("You have chosen an invalid command\n")
 
 except Exception as info:
     print (info)
